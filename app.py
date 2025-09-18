@@ -66,7 +66,8 @@ if st.sidebar.button("Add Tree"):
 # Display tree table
 st.subheader("Current Trees")
 if st.session_state.trees:
-    st.dataframe(pd.DataFrame(st.session_state.trees))
+    tree_df = pd.DataFrame(st.session_state.trees)
+    st.dataframe(tree_df)
 else:
     st.write("No trees added yet.")
 
