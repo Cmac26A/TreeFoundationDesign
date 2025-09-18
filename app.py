@@ -35,7 +35,10 @@ PARAM_DB = pd.read_excel('Tree_linegraphs.xlsx', sheet_name='Sheet1', engine='op
 st.title("GGP Consult: Tree influence on Foundation Design Model")
 
 st.markdown("""
-### 📘 Instructions
+Created by C.J. McAteer
+
+
+### How to use
 Welcome to the Tree influence on Foundation Design. Here's how to use the app:
 
 1. **Set Global Parameters**:
