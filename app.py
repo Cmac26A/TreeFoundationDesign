@@ -256,7 +256,14 @@ if st.session_state.trees:
         })
     
     # Generate section plots
-    interp_func = RegularGridInterpolator((y_coords, x_coords), combined_elevations)
+    
+    interp_func = RegularGridInterpolator(
+        (y_coords, x_coords),
+        combined_elevations,
+        bounds_error=False,
+        fill_value=np.nan
+    )
+
     for line in st.session_state.section_lines:
         x1, y1 = line['start']
         x2, y2 = line['end']
@@ -286,5 +293,5 @@ if st.session_state.trees:
     
         
     
-        
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, width='stretch')
+       
