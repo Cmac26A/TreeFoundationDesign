@@ -17,24 +17,35 @@ def load_depth_function_data():
     return df
 
 def get_depth_params(species_name, species_df, depth_df, soil_type):
-    tree = species_df[species_df['Category'] == species_name].iloc[0]
+    tree_match = species_df[species_df['Category'] == species_name]
+    if tree_match.empty:
+        return None, None, None
+    tree = tree_match.iloc[0]
     coniferous = tree['Coniferous']
     water_demand = tree['Water Demand']
     match = depth_df[(depth_df['Coniferous'] == coniferous) &
                      (depth_df['Water Demand'] == water_demand) &
                      (depth_df['Soil volume potential'] == soil_type)]
-    if not match.empty:
-        params = match.iloc[0]
-        return params['x2'], params['x1'], params['y1']
-    else:
+    if match.empty:
         return None, None, None
+    params = match.iloc[0]
+    return params['x2'], params['x1'], params['y1']
 
 def compute_depth(r, x2, x1, y1):
     return x2 * r**2 + x1 * r + y1
 
-def model_influence(trees, species_df, depth_df, soil_type, grid_size=100, spacing=1.0):
-    x_vals = np.linspace(0, grid_size * spacing, grid_size)
-    y_vals = np.linspace(0, grid_size * spacing, grid_size)
+def model_influence(trees, species_df, depth_df, soil_type, spacing=1.0):
+    if not trees:
+        return None, None, None
+
+    x_coords = [tree['x'] for tree in trees]
+    y_coords = [tree['y'] for tree in trees]
+    buffer = 10
+    x_min, x_max = min(x_coords) - buffer, max(x_coords) + buffer
+    y_min, y_max = min(y_coords) - buffer, max(y_coords) + buffer
+
+    x_vals = np.arange(x_min, x_max, spacing)
+    y_vals = np.arange(y_min, y_max, spacing)
     X, Y = np.meshgrid(x_vals, y_vals)
     Z = np.full_like(X, np.nan)
 
@@ -90,10 +101,13 @@ if st.session_state.trees:
     st.dataframe(pd.DataFrame(st.session_state.trees))
 
     X, Y, Z = model_influence(st.session_state.trees, species_df, depth_df, soil_type)
-    fig, ax = plt.subplots()
-    contour = ax.contourf(X, Y, Z, levels=20, cmap='viridis')
-    plt.colorbar(contour, ax=ax)
-    ax.set_title("Contour Plot of Tree Root Influence")
-    st.pyplot(fig)
+    if X is not None and Y is not None and Z is not None:
+        fig, ax = plt.subplots()
+        contour = ax.contourf(X, Y, Z, levels=20, cmap='viridis')
+        plt.colorbar(contour, ax=ax)
+        ax.set_title("Contour Plot of Tree Root Influence")
+        st.pyplot(fig)
+    else:
+        st.warning("No valid depth data available for the current tree inputs.")
 else:
     st.info("No trees added yet.")
