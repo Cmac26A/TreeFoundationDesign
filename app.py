@@ -75,9 +75,9 @@ if st.session_state.trees:
 
         def cone_function(radial_distance):
             if radial_distance < 0:
-                return 0.0
+                return 10000.0
             if radial_distance > lateral_limit:
-                return 0.0
+                return 10000.0
 
             d_over_h = radial_distance / height_to_use
 
