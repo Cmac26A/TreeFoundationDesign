@@ -128,7 +128,7 @@ if st.session_state.trees:
             z=combined_elevations,
             x=x_coords,
             y=y_coords,
-            colorscale='Earth',
+            colorscale='Viridis',
             contours=dict(
                 start=z_min-0.3,       # minimum elevation value
                 end=z_max+0.3,         # maximum elevation value
