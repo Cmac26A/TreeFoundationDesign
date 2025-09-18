@@ -4,6 +4,30 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
+import streamlit as st
+
+# Page config
+st.set_page_config(page_title="Tree Root Influence App", page_icon="🌳", layout="wide")
+
+# Custom sidebar style
+st.markdown("""
+    <style>
+        [data-testid="stSidebar"] {
+            background-color: #d4f4dd;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# Sidebar logo
+st.sidebar.image("Logo.jpeg", use_container_width=True)
+
+# Main page banner
+st.image("Banner.jpeg", use_container_width=True)
+
+
+
+
+
 # Load tree species and parameter data
 TREE_DB = pd.read_excel('Tree_data.xlsx', sheet_name='Sheet1', engine='openpyxl')
 PARAM_DB = pd.read_excel('Tree_linegraphs.xlsx', sheet_name='Sheet1', engine='openpyxl')
