@@ -197,13 +197,14 @@ if st.session_state.trees:
                       xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=1000)
 
 
-    
+
+
     # Initialize session state
     if 'section_lines' not in st.session_state:
         st.session_state.section_lines = []
     if 'click_points' not in st.session_state:
         st.session_state.click_points = []
-
+    
 
     
     # Add section lines to plot
@@ -226,11 +227,17 @@ if st.session_state.trees:
     st.subheader("Click two points to define a section line")
     st.plotly_chart(fig, use_container_width=True)
     
-    # Simulated click input (replace with real click capture later)
-    x_click = st.number_input("X coordinate of click", min_value=0.0, max_value=100.0, value=50.0)
-    y_click = st.number_input("Y coordinate of click", min_value=0.0, max_value=100.0, value=50.0)
+    # Allow user to input any coordinates
+    x_click = st.number_input("X coordinate of click", value=0.0)
+    y_click = st.number_input("Y coordinate of click", value=0.0)
     if st.button("Add Click Point"):
         st.session_state.click_points.append((x_click, y_click))
+    
+    # Show table of click points
+    if st.session_state.click_points:
+        st.subheader("Click Points")
+        click_df = pd.DataFrame(st.session_state.click_points, columns=['X', 'Y'])
+        st.dataframe(click_df)
     
     # Create section line if two points are clicked
     if len(st.session_state.click_points) >= 2:
@@ -275,7 +282,7 @@ if st.session_state.trees:
         )
         st.plotly_chart(section_fig, use_container_width=True)
     
-    
+        
     
         
         st.plotly_chart(fig)
