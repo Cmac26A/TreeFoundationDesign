@@ -75,17 +75,26 @@ combined_elevations = np.full(X.shape, starting_elevation)
 
 # Process each tree
 for tree in st.session_state.trees:
-    tree_data = TREE_DB[TREE_DB['Category'] == tree['Tree Name']].iloc[0]
+    tree_match = TREE_DB[TREE_DB['Category'] == tree['Tree Name']]
+    if tree_match.empty:
+        st.warning(f"Tree species '{tree['Tree Name']}' not found in database. Skipping.")
+        continue
+
+    tree_data = tree_match.iloc[0]
     mature_height = tree_data['Mature Height']
     is_coniferous = tree_data['Coniferous']
     water_demand = tree_data['Water Demand']
 
-    params = PARAM_DB[
+    param_match = PARAM_DB[
         (PARAM_DB['Soil volume potential'] == 'High') &
         (PARAM_DB['Coniferous'] == is_coniferous) &
         (PARAM_DB['Water Demand'] == water_demand)
-    ].iloc[0]
+    ]
+    if param_match.empty:
+        st.warning(f"No matching parameters for tree '{tree['Tree Name']}'. Skipping.")
+        continue
 
+    params = param_match.iloc[0]
     cone_func = create_cone_function(params, mature_height)
     radial_distances = np.sqrt((X - tree['X'])**2 + (Y - tree['Y'])**2)
     current_depths = np.vectorize(cone_func)(radial_distances)
