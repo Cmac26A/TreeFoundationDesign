@@ -10,8 +10,12 @@ PARAM_DB = pd.read_excel('Tree_linegraphs.xlsx', sheet_name='Sheet1', engine='op
 
 # Cone function generator
 def create_cone_function(params, mature_height):
-    depth_factor = params['x2']
-    spread_factor = params['y1']
+    try:
+        depth_factor = float(params['x2'])
+        spread_factor = float(params['y1'])
+    except (KeyError, ValueError):
+        depth_factor = 1.0
+        spread_factor = 1.0
     max_radius = mature_height * spread_factor
     max_depth = -mature_height * depth_factor
     def cone_func(r):
@@ -39,7 +43,7 @@ except ValueError:
 
 # Tree input
 st.sidebar.header("Add Tree")
-tree_name = st.sidebar.selectbox("Tree Species", TREE_DB['Category'].unique())
+tree_name = st.sidebar.selectbox("Tree Species", TREE_DB['Category'].dropna().unique())
 x_coord = st.sidebar.text_input("X Coordinate", "50")
 y_coord = st.sidebar.text_input("Y Coordinate", "50")
 z_coord = st.sidebar.text_input("Tree Base Elevation", str(starting_elevation))
@@ -54,7 +58,7 @@ if st.sidebar.button("Add Tree"):
         y_val = float(y_coord)
         z_val = float(z_coord)
         st.session_state.trees.append({
-            'Tree Name': tree_name,
+            'Tree Name': str(tree_name),
             'X': x_val,
             'Y': y_val,
             'Z': z_val,
@@ -66,8 +70,11 @@ if st.sidebar.button("Add Tree"):
 # Display tree table
 st.subheader("Current Trees")
 if st.session_state.trees:
-    tree_df = pd.DataFrame(st.session_state.trees)
-    st.dataframe(tree_df)
+    try:
+        tree_df = pd.DataFrame(st.session_state.trees)
+        st.dataframe(tree_df)
+    except Exception as e:
+        st.warning(f"Error displaying tree table: {e}")
 else:
     st.write("No trees added yet.")
 
@@ -79,33 +86,34 @@ combined_elevations = np.full(X.shape, starting_elevation)
 
 # Process each tree
 for tree in st.session_state.trees:
-    if tree['Tree Name'] not in TREE_DB['Category'].values:
-        st.warning(f"Tree species '{tree['Tree Name']}' not found in database. Skipping.")
-        continue
-    if 'Z' not in tree:
-        st.warning(f"Missing base elevation (Z) for tree '{tree['Tree Name']}'. Skipping.")
-        continue
+    try:
+        tree_data = TREE_DB[TREE_DB['Category'] == tree['Tree Name']]
+        if tree_data.empty:
+            st.warning(f"Tree species '{tree['Tree Name']}' not found in database. Skipping.")
+            continue
+        tree_data = tree_data.iloc[0]
+        mature_height = float(tree_data['Mature Height'])
+        is_coniferous = tree_data['Coniferous']
+        water_demand = tree_data['Water Demand']
 
-    tree_data = TREE_DB[TREE_DB['Category'] == tree['Tree Name']].iloc[0]
-    mature_height = tree_data['Mature Height']
-    is_coniferous = tree_data['Coniferous']
-    water_demand = tree_data['Water Demand']
+        params_match = PARAM_DB[
+            (PARAM_DB['Soil volume potential'] == 'High') &
+            (PARAM_DB['Coniferous'] == is_coniferous) &
+            (PARAM_DB['Water Demand'] == water_demand)
+        ]
+        if params_match.empty:
+            st.warning(f"No matching parameters for tree '{tree['Tree Name']}'. Using default values.")
+            params = {'x2': 1.0, 'y1': 1.0}
+        else:
+            params = params_match.iloc[0]
 
-    params_match = PARAM_DB[
-        (PARAM_DB['Soil volume potential'] == 'High') &
-        (PARAM_DB['Coniferous'] == is_coniferous) &
-        (PARAM_DB['Water Demand'] == water_demand)
-    ]
-    if params_match.empty:
-        st.warning(f"No matching parameters for tree '{tree['Tree Name']}'. Skipping.")
-        continue
-
-    params = params_match.iloc[0]
-    cone_func = create_cone_function(params, mature_height)
-    radial_distances = np.sqrt((X - tree['X'])**2 + (Y - tree['Y'])**2)
-    current_depths = np.vectorize(cone_func)(radial_distances)
-    current_elevations = tree['Z'] + current_depths
-    combined_elevations = np.minimum(combined_elevations, current_elevations)
+        cone_func = create_cone_function(params, mature_height)
+        radial_distances = np.sqrt((X - tree['X'])**2 + (Y - tree['Y'])**2)
+        current_depths = np.vectorize(cone_func)(radial_distances)
+        current_elevations = tree['Z'] + current_depths
+        combined_elevations = np.minimum(combined_elevations, current_elevations)
+    except Exception as e:
+        st.warning(f"Error processing tree '{tree['Tree Name']}': {e}")
 
 # Plot
 fig = go.Figure(data=
