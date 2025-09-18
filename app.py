@@ -10,14 +10,12 @@ PARAM_DB = pd.read_excel('Tree_linegraphs.xlsx', sheet_name='Sheet1', engine='op
 
 st.title("Tree Root Influence Contour Model")
 
-# Global parameters
 st.sidebar.header("Global Parameters")
 soil_plasticity = st.sidebar.text_input("Soil Plasticity", "High")
 ffl = float(st.sidebar.text_input("Finished Floor Level (FFL)", "13"))
 min_depth = float(st.sidebar.text_input("Minimum Depth", "1"))
 starting_elevation = ffl - min_depth
 
-# Tree input
 st.sidebar.header("Add Tree")
 tree_name = st.sidebar.selectbox("Tree Species", TREE_DB['Category'].unique())
 x_coord = float(st.sidebar.text_input("X Coordinate", "50"))
@@ -45,7 +43,7 @@ if st.session_state.trees:
     y_vals = [tree['Y'] for tree in st.session_state.trees]
     min_x, max_x = min(x_vals), max(x_vals)
     min_y, max_y = min(y_vals), max(y_vals)
-    padding = 10
+    padding = 50
     x_coords = np.linspace(min_x - padding, max_x + padding, 200)
     y_coords = np.linspace(min_y - padding, max_y + padding, 200)
     X, Y = np.meshgrid(x_coords, y_coords)
@@ -131,5 +129,6 @@ if st.session_state.trees:
             line_smoothing=0.85
         )
     )
-    fig.update_layout(title='Combined Tree Root Influence Elevation Map')
+    fig.update_layout(title='Combined Tree Root Influence Elevation Map',
+                      xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'))
     st.plotly_chart(fig)
