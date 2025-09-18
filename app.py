@@ -120,8 +120,8 @@ if st.session_state.trees:
         combined_elevations = np.minimum(combined_elevations, current_elevations)
 
 
-    zmin = combined_elevations.min()
-    zmax = combined_elevations.max()
+    z_min = combined_elevations.min()
+    z_max = combined_elevations.max()
     
     fig = go.Figure(data=
         go.Contour(
