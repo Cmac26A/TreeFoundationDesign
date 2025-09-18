@@ -130,9 +130,9 @@ if st.session_state.trees:
             y=y_coords,
             colorscale='Earth',
             contours=dict(
-                start=z_min,       # minimum elevation value
-                end=z_max,         # maximum elevation value
-                size=0.15,         # spacing between contour levels
+                start=z_min-0.3,       # minimum elevation value
+                end=z_max+0.3,         # maximum elevation value
+                size=0.3,         # spacing between contour levels
                 coloring='heatmap' # use heatmap-style coloring
             ),
             line_smoothing=0.85
