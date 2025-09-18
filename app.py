@@ -65,7 +65,10 @@ if st.sidebar.button("Add Tree"):
 
 # Display tree table
 st.subheader("Current Trees")
-st.write(pd.DataFrame(st.session_state.trees))
+if st.session_state.trees:
+    st.dataframe(pd.DataFrame(st.session_state.trees))
+else:
+    st.write("No trees added yet.")
 
 # Create grid
 x_coords = np.linspace(0, 100, 200)
