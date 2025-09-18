@@ -120,13 +120,6 @@ if st.session_state.trees:
         combined_elevations = np.minimum(combined_elevations, current_elevations)
 
     
-    from plotly.colors import sample_colorscale
-
-    # Sample evenly spaced colors from Magma
-    colorscale = sample_colorscale('Magma', [i / (n - 1) for i in range(n)])
-
-    # Convert to discrete format
-    discrete_colorscale = [[i / (n - 1), color] for i, color in enumerate(colorscale)]
 
 
     z_min = combined_elevations.min()
@@ -137,7 +130,7 @@ if st.session_state.trees:
             z=combined_elevations,
             x=x_coords,
             y=y_coords,
-            colorscale=discrete_colorscale,
+            colorscale=Greens,
             contours=dict(
                 start=z_min-0.3,       # minimum elevation value
                 end=z_max+0.3,         # maximum elevation value
