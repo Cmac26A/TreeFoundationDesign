@@ -119,13 +119,22 @@ if st.session_state.trees:
         current_elevations = tree['Z'] + current_depths
         combined_elevations = np.minimum(combined_elevations, current_elevations)
 
+
+    zmin = combined_elevations.min()
+    zmax = combined_elevations.max()
+    
     fig = go.Figure(data=
         go.Contour(
             z=combined_elevations,
             x=x_coords,
             y=y_coords,
             colorscale='Earth',
-            contours_coloring='heatmap',
+            contours=dict(
+                start=z_min,       # minimum elevation value
+                end=z_max,         # maximum elevation value
+                size=0.15,         # spacing between contour levels
+                coloring='heatmap' # use heatmap-style coloring
+            ),
             line_smoothing=0.85
         )
     )
