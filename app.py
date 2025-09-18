@@ -124,7 +124,7 @@ if st.session_state.trees:
             z=combined_elevations,
             x=x_coords,
             y=y_coords,
-            colorscale='Magma',
+            colorscale='Terrain',
             contours_coloring='heatmap',
             line_smoothing=0.85
         )
