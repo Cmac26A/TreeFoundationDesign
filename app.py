@@ -56,7 +56,8 @@ Welcome to the Tree influence on Foundation Design. Here's how to use the app:
    - The plot shows the cumulative root influence zones.
    - Colors represent depth influence, with discrete contour intervals.
 
-Use this tool to assess potential root impacts on foundations and soil structures.
+5. **Reset**
+   - Press c and enter to clear cache, press r to rerun
 """)
 
 
