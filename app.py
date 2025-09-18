@@ -193,5 +193,5 @@ if st.session_state.trees:
         )
     )
     fig.update_layout(title='Combined Tree Root Influence Elevation Map',
-                      xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=900)
+                      xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=1100)
     st.plotly_chart(fig)
