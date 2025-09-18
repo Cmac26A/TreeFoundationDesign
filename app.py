@@ -74,27 +74,29 @@ if st.session_state.trees:
             return lambda radial_distance: 0.0
 
         def cone_function(radial_distance):
-            if radial_distance < 0 or radial_distance > lateral_limit:
-                return 0.0  # No influence beyond lateral limit
+            if radial_distance < 0:
+                return 0.0
+            if radial_distance > lateral_limit:
+                return 0.0
+
             d_over_h = radial_distance / height_to_use
 
-        if pd.isna(x1):
-            if d_over_h <= x2:
-                slope = (1 - y1) / x2
-                depth = slope * d_over_h + y1
-                return -max(depth, -abs(min_depth))
+            if pd.isna(x1):
+                if d_over_h <= x2:
+                    slope = (1 - y1) / x2
+                    depth = slope * d_over_h + y1
+                    return -max(depth, -abs(min_depth))
+                else:
+                    return min_depth
             else:
-                return 0.0  # Cut off
-        else:
-            if d_over_h < x1:
-                return -2.5
-            elif x1 <= d_over_h <= x2:
-                slope = (1 - 2.5) / (x2 - x1)
-                depth = slope * (d_over_h - x1) + 2.5
-                return -max(depth, -abs(min_depth))
-            else:
-                return 0.0  # Cut off
-
+                if d_over_h < x1:
+                    return -2.5
+                elif x1 <= d_over_h <= x2:
+                    slope = (1 - 2.5) / (x2 - x1)
+                    depth = slope * (d_over_h - x1) + 2.5
+                    return -max(depth, -abs(min_depth))
+                else:
+                    return min_depth
 
         return cone_function
 
