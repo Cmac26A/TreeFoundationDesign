@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 # Page config
-st.set_page_config(page_title="Tree Root Influence App", page_icon="🌳", layout="wide")
+st.set_page_config(page_title="GGP - Foundations Near Trees", page_icon="🌳", layout="wide")
 
 # Custom sidebar style
 st.markdown("""
@@ -33,7 +33,6 @@ TREE_DB = pd.read_excel('Tree_data.xlsx', sheet_name='Sheet1', engine='openpyxl'
 PARAM_DB = pd.read_excel('Tree_linegraphs.xlsx', sheet_name='Sheet1', engine='openpyxl')
 
 st.title("GGP Consult: Tree influence on Foundation Design Model")
-st.subtitle("Created by C.J. McAteer, Structural Engineer")
 
 st.markdown("""
 ### 📘 Instructions
