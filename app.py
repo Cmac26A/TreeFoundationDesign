@@ -10,6 +10,31 @@ PARAM_DB = pd.read_excel('Tree_linegraphs.xlsx', sheet_name='Sheet1', engine='op
 
 st.title("Tree Root Influence Contour Model")
 
+st.markdown("""
+### 📘 Instructions
+Welcome to the Tree influence on Foundation Design. Here's how to use the app:
+
+1. **Set Global Parameters**:
+   - Enter the Finished Floor Level (FFL), Minimum Foundation Depth, and Soil Plasticity Index in the sidebar.
+
+2. **Add Trees**:
+   - Select a tree species from the dropdown.
+   - Enter the mature height and X, Y, Z coordinates.
+   - Click **Add Tree** to include it in the model.
+
+3. **View Tree Data**:
+   - The table below shows all trees you've added.
+
+4. **Interpret the Contour Plot**:
+   - The plot shows the cumulative root influence zones.
+   - Colors represent depth influence, with discrete contour intervals.
+
+Use this tool to assess potential root impacts on foundations and soil structures.
+""")
+
+
+
+
 st.sidebar.header("Global Parameters")
 soil_plasticity = st.sidebar.text_input("Soil Plasticity", "High")
 ffl = float(st.sidebar.text_input("Finished Floor Level (FFL)", "13"))
