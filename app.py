@@ -1,83 +1,113 @@
 
 import streamlit as st
-import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
+import numpy as np
+import matplotlib.pyplot as plt
 
-# Simulated tree data (replace with actual data loading if needed)
-tree_df = pd.DataFrame({
-    'Category': ['Oak', 'Pine', 'Maple', 'Birch', 'Elm'],
-    'Mature Height': [20, 25, 18, 15, 22],
-    'Coniferous': [False, True, False, False, False],
-    'Water Demand': ['Medium', 'High', 'Low', 'Medium', 'High']
-})
+@st.cache_data
+def load_tree_species_data():
+    df = pd.read_excel("Tree_data.xlsx", engine="openpyxl")
+    df['Coniferous'] = df['Coniferous'].map({'T': True, 'F': False})
+    return df
 
-tree_graph_df = pd.DataFrame({
-    'Soil volume potential': ['High'] * 5,
-    'Coniferous': [False, True, False, False, False],
-    'Water Demand': ['Medium', 'High', 'Low', 'Medium', 'High'],
-    'Depth Factor': [1.0, 1.2, 0.8, 0.9, 1.1],
-    'Spread Factor': [1.5, 2.0, 1.2, 1.3, 1.6]
-})
+@st.cache_data
+def load_depth_function_data():
+    df = pd.read_excel("Tree_linegraphs.xlsx", engine="openpyxl")
+    df['Coniferous'] = df['Coniferous'].map({'T': True, 'F': False})
+    return df
 
-# UI inputs
-st.title("Tree Root Influence Contour Plot")
+def get_depth_params(species_name, species_df, depth_df, soil_type):
+    tree_match = species_df[species_df['Category'] == species_name]
+    if tree_match.empty:
+        return None, None, None
+    tree = tree_match.iloc[0]
+    coniferous = tree['Coniferous']
+    water_demand = tree['Water Demand']
+    match = depth_df[(depth_df['Coniferous'] == coniferous) &
+                     (depth_df['Water Demand'] == water_demand) &
+                     (depth_df['Soil volume potential'] == soil_type)]
+    if match.empty:
+        return None, None, None
+    params = match.iloc[0]
+    return params['x2'], params['x1'], params['y1']
 
-selected_species = st.selectbox("Select Tree Species", tree_df['Category'].unique())
-height = st.number_input("Tree Height (m)", min_value=0.0, step=0.1)
-X_coord = st.number_input("Tree X Coordinate", value=50.0)
-Y_coord = st.number_input("Tree Y Coordinate", value=50.0)
-FFL = st.number_input("Finished Floor Level (FFL) (m)", value=13.0)
-min_depth = st.number_input("Minimum Depth (m)", value=1.0)
+def compute_depth(r, x2, x1, y1):
+    return x2 * r**2 + x1 * r + y1
 
-if st.button("Generate Contour Plot"):
-    initial_elevation = FFL - min_depth
+def model_influence(trees, species_df, depth_df, soil_type, spacing=1.0):
+    if not trees:
+        return None, None, None
 
-    # Create grid
-    x_coords = np.linspace(X_coord - 30, X_coord + 30, 200)
-    y_coords = np.linspace(Y_coord - 30, Y_coord + 30, 200)
-    X, Y = np.meshgrid(x_coords, y_coords)
-    combined_elevations = np.full(X.shape, initial_elevation)
+    x_coords = [tree['x'] for tree in trees]
+    y_coords = [tree['y'] for tree in trees]
+    buffer = 10
+    x_min, x_max = min(x_coords) - buffer, max(x_coords) + buffer
+    y_min, y_max = min(y_coords) - buffer, max(y_coords) + buffer
 
-    # Get tree parameters
-    tree_info = tree_df[tree_df['Category'] == selected_species].iloc[0]
-    mature_height = tree_info['Mature Height']
-    is_coniferous = tree_info['Coniferous']
-    water_demand = tree_info['Water Demand']
+    x_vals = np.arange(x_min, x_max, spacing)
+    y_vals = np.arange(y_min, y_max, spacing)
+    X, Y = np.meshgrid(x_vals, y_vals)
+    Z = np.full_like(X, np.nan)
 
-    params_row = tree_graph_df[
-        (tree_graph_df['Soil volume potential'] == 'High') &
-        (tree_graph_df['Coniferous'] == is_coniferous) &
-        (tree_graph_df['Water Demand'] == water_demand)
-    ]
-    if params_row.empty:
-        st.error("No parameters found for selected tree.")
+    for tree in trees:
+        x, y, z, species, removal = tree['x'], tree['y'], tree['z'], tree['species'], tree['removal']
+        if removal:
+            continue
+        x2, x1, y1 = get_depth_params(species, species_df, depth_df, soil_type)
+        if None in (x2, x1, y1):
+            continue
+        R = np.sqrt((X - x)**2 + (Y - y)**2)
+        depth = compute_depth(R, x2, x1, y1)
+        absolute_depth = z - depth
+        if np.isnan(Z).all():
+            Z = absolute_depth
+        else:
+            Z = np.minimum(Z, absolute_depth)
+
+    return X, Y, Z
+
+if 'trees' not in st.session_state:
+    st.session_state.trees = []
+
+species_df = load_tree_species_data()
+depth_df = load_depth_function_data()
+species_list = species_df['Category'].tolist()
+
+st.title("Tree Root Influence Design Tool")
+st.write("Input tree data to model root influence on foundations.")
+
+soil_type = st.selectbox("Select Soil Plasticity", ["High", "Medium", "Low"])
+
+with st.form("tree_input_form"):
+    x = st.number_input("X Coordinate", value=0.0)
+    y = st.number_input("Y Coordinate", value=0.0)
+    z = st.number_input("Z Elevation", value=0.0)
+    species = st.selectbox("Tree Species", species_list)
+    removal = st.checkbox("Tree will be removed")
+    submitted = st.form_submit_button("Add Tree")
+
+    if submitted:
+        st.session_state.trees.append({
+            'x': x,
+            'y': y,
+            'z': z,
+            'species': species,
+            'removal': removal
+        })
+        st.success(f"Tree '{species}' added at ({x}, {y}, {z})")
+
+if st.session_state.trees:
+    st.subheader("Added Trees")
+    st.dataframe(pd.DataFrame(st.session_state.trees))
+
+    X, Y, Z = model_influence(st.session_state.trees, species_df, depth_df, soil_type)
+    if X is not None and Y is not None and Z is not None:
+        fig, ax = plt.subplots()
+        contour = ax.contourf(X, Y, Z, levels=20, cmap='viridis')
+        plt.colorbar(contour, ax=ax)
+        ax.set_title("Contour Plot of Tree Root Influence")
+        st.pyplot(fig)
     else:
-        params = params_row.iloc[0]
-        depth_factor = params['Depth Factor']
-        spread_factor = params['Spread Factor']
-        max_radius = mature_height * spread_factor
-        max_depth = -height * depth_factor
-
-        def cone_func(r):
-            if r > max_radius:
-                return 0.0
-            return max_depth * (1 - r / max_radius)
-
-        radial_distances = np.sqrt((X - X_coord)**2 + (Y - Y_coord)**2)
-        current_tree_depths = np.vectorize(cone_func)(radial_distances)
-        current_tree_elevations = FFL + current_tree_depths
-        combined_elevations = np.minimum(combined_elevations, current_tree_elevations)
-
-        fig = go.Figure(data=
-            go.Contour(
-                z=combined_elevations,
-                x=x_coords,
-                y=y_coords,
-                colorscale='Viridis',
-                contours_coloring='heatmap',
-                line_smoothing=0.85
-            )
-        )
-        fig.update_layout(title='Tree Root Influence Elevation Map')
-        st.plotly_chart(fig)
+        st.warning("No valid depth data available for the current tree inputs.")
+else:
+    st.info("No trees added yet.")
