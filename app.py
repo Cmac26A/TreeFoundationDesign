@@ -4,60 +4,66 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-# Define tree database
-TREE_DB = pd.DataFrame({
-    'Category': ['Oak', 'Pine', 'Maple'],
-    'Mature Height': [20, 25, 18],
-    'Coniferous': [False, True, False],
-    'Water Demand': ['Medium', 'High', 'Low']
-})
-
-PARAM_DB = pd.DataFrame({
-    'Soil volume potential': ['High', 'High', 'High'],
-    'Coniferous': [False, True, False],
-    'Water Demand': ['Medium', 'High', 'Low'],
-    'Depth Factor': [1.0, 1.2, 0.8],
-    'Spread Factor': [1.5, 2.0, 1.2]
-})
+# Load real datasets
+TREE_DB = pd.read_excel('Tree_data.xlsx', sheet_name='Sheet1', engine='openpyxl')
+PARAM_DB = pd.read_excel('Tree_linegraphs.xlsx', sheet_name='Sheet1', engine='openpyxl')
 
 # Cone function generator
-def create_cone_function(params, height_to_use, mature_height):
-    depth_factor = params['Depth Factor']
-    spread_factor = params['Spread Factor']
+def create_cone_function(params, mature_height):
+    depth_factor = params['x2']
+    spread_factor = params['y1']
     max_radius = mature_height * spread_factor
-    max_depth = -height_to_use * depth_factor
-
+    max_depth = -mature_height * depth_factor
     def cone_func(r):
         if r > max_radius:
             return 0.0
         return max_depth * (1 - r / max_radius)
-
     return cone_func
 
 # Streamlit UI
 st.title("Tree Root Influence Contour Model")
 
+# Global parameters
+st.sidebar.header("Global Parameters")
+soil_plasticity = st.sidebar.text_input("Soil Plasticity", "Medium")
+ffl = st.sidebar.text_input("Finished Floor Level (FFL)", "13")
+min_depth = st.sidebar.text_input("Minimum Depth", "1")
+
+try:
+    ffl_val = float(ffl)
+    min_depth_val = float(min_depth)
+    starting_elevation = ffl_val - min_depth_val
+except ValueError:
+    st.error("Please enter valid numeric values for FFL and Minimum Depth.")
+    st.stop()
+
+# Tree input
 st.sidebar.header("Add Tree")
 tree_name = st.sidebar.selectbox("Tree Species", TREE_DB['Category'].unique())
-x_coord = st.sidebar.slider("X Coordinate", 0, 100, 50)
-y_coord = st.sidebar.slider("Y Coordinate", 0, 100, 50)
-current_height = st.sidebar.slider("Current Height (m)", 1, 30, 10)
+x_coord = st.sidebar.text_input("X Coordinate", "50")
+y_coord = st.sidebar.text_input("Y Coordinate", "50")
+z_coord = st.sidebar.text_input("Tree Base Elevation", str(starting_elevation))
 remove_status = st.sidebar.selectbox("Remove Tree?", ['No', 'Yes'])
-tree_base_height = st.sidebar.slider("Tree Base Elevation", -10.0, 10.0, 0.0)
 
 if 'trees' not in st.session_state:
     st.session_state.trees = []
 
 if st.sidebar.button("Add Tree"):
-    st.session_state.trees.append({
-        'Tree Name': tree_name,
-        'X': x_coord,
-        'Y': y_coord,
-        'Current Height': current_height,
-        'Remove': remove_status,
-        'Tree base height': tree_base_height
-    })
+    try:
+        x_val = float(x_coord)
+        y_val = float(y_coord)
+        z_val = float(z_coord)
+        st.session_state.trees.append({
+            'Tree Name': tree_name,
+            'X': x_val,
+            'Y': y_val,
+            'Z': z_val,
+            'Remove': remove_status
+        })
+    except ValueError:
+        st.error("Please enter valid numeric values for coordinates.")
 
+# Display tree table
 st.subheader("Current Trees")
 st.write(pd.DataFrame(st.session_state.trees))
 
@@ -65,7 +71,7 @@ st.write(pd.DataFrame(st.session_state.trees))
 x_coords = np.linspace(0, 100, 200)
 y_coords = np.linspace(0, 100, 200)
 X, Y = np.meshgrid(x_coords, y_coords)
-combined_elevations = np.full(X.shape, 9999.0)
+combined_elevations = np.full(X.shape, starting_elevation)
 
 # Process each tree
 for tree in st.session_state.trees:
@@ -74,18 +80,16 @@ for tree in st.session_state.trees:
     is_coniferous = tree_data['Coniferous']
     water_demand = tree_data['Water Demand']
 
-    height_to_use = tree['Current Height'] if tree['Remove'] == 'Yes' else mature_height
-
     params = PARAM_DB[
         (PARAM_DB['Soil volume potential'] == 'High') &
         (PARAM_DB['Coniferous'] == is_coniferous) &
         (PARAM_DB['Water Demand'] == water_demand)
     ].iloc[0]
 
-    cone_func = create_cone_function(params, height_to_use, mature_height)
+    cone_func = create_cone_function(params, mature_height)
     radial_distances = np.sqrt((X - tree['X'])**2 + (Y - tree['Y'])**2)
     current_depths = np.vectorize(cone_func)(radial_distances)
-    current_elevations = tree['Tree base height'] + current_depths
+    current_elevations = tree['Z'] + current_depths
     combined_elevations = np.minimum(combined_elevations, current_elevations)
 
 # Plot
@@ -100,5 +104,4 @@ fig = go.Figure(data=
     )
 )
 fig.update_layout(title='Combined Tree Root Influence Elevation Map')
-
 st.plotly_chart(fig)
