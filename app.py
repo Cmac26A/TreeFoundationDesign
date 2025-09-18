@@ -32,7 +32,8 @@ st.image("Banner.jpeg", use_container_width=True)
 TREE_DB = pd.read_excel('Tree_data.xlsx', sheet_name='Sheet1', engine='openpyxl')
 PARAM_DB = pd.read_excel('Tree_linegraphs.xlsx', sheet_name='Sheet1', engine='openpyxl')
 
-st.title("Tree Root Influence Contour Model")
+st.title("GGP Consult: Tree influence on Foundation Design Model")
+st.subtitle("Created by C.J. McAteer, Structural Engineer")
 
 st.markdown("""
 ### 📘 Instructions
