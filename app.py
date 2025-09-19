@@ -1,9 +1,10 @@
 
 import streamlit as st
+from scipy.interpolate import RegularGridInterpolator
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from scipy.interpolate import RegularGridInterpolator
+
 import streamlit as st
 
 # Page config
@@ -231,7 +232,7 @@ if st.session_state.trees:
     
     # Display plot
     st.subheader("Click two points to define a section line")
-    st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch', key='main_contour')
     
     # Allow user to input any coordinates
     x_click = st.number_input("X coordinate of click", value=0.0)
@@ -295,9 +296,9 @@ if st.session_state.trees:
             yaxis_scaleanchor='x',
             height=600
         )
-        st.plotly_chart(section_fig, use_container_width=True)
+st.plotly_chart(section_fig, width='stretch', key='section_0')
     
         
     
-        st.plotly_chart(fig, width='stretch')
+st.plotly_chart(fig, width='stretch', key='main_contour')
        
