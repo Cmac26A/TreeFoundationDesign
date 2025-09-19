@@ -110,7 +110,7 @@ if st.sidebar.button("Add Tree"):
         'X': x_coord,
         'Y': y_coord,
         'Z': z_coord,
-        'Remove': remove_status
+        'Remove': remove_status,
         'Current Height': current_height
     })
 
