@@ -242,6 +242,11 @@ if st.session_state.trees:
     st.subheader("Click two points to define a section line")
 st.plotly_chart(fig, width='stretch', key='main_contour')
 
+if 'section_lines' not in st.session_state:
+        st.session_state.section_lines = []
+if 'click_points' not in st.session_state:
+        st.session_state.click_points = []
+
 
     
     # Allow user to input any coordinates
