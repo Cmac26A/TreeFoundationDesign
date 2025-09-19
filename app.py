@@ -76,6 +76,9 @@ y_coord = float(st.sidebar.text_input("Y Coordinate", "50"))
 z_coord = float(st.sidebar.text_input("Tree Base Elevation", str(starting_elevation)))
 remove_status = st.sidebar.selectbox("Remove Tree?", ['No', 'Yes'])
 
+st.sidebar.header("Re-run figure to update sections")
+section = float(st.sidebar.text_input("Type any number and enter to update")) 
+
 if 'trees' not in st.session_state:
     st.session_state.trees = []
 
@@ -205,9 +208,6 @@ if st.session_state.trees:
     if 'click_points' not in st.session_state:
         st.session_state.click_points = []
 
-# Simple rerun button in sidebar
-if st.sidebar.button("Re-run Figure"):
-    st.experimental_rerun()
     
 
     
