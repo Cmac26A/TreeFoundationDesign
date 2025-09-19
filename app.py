@@ -315,7 +315,7 @@ if st.session_state.trees and st.session_state.section_lines:
             height=600
         )
 
-st.plotly_chart(section_fig, width='stretch', key='section_0')
+    st.plotly_chart(section_fig, width='stretch', key='section_0')
             
     
 
