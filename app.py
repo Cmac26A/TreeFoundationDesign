@@ -68,10 +68,16 @@ Welcome to the Tree influence on Foundation Design. Here's how to use the app:
    - The plot shows the cumulative root influence zones.
    - Colors represent depth influence, with discrete contour intervals.
 
-5. **Reset**
+5. **Create a section**: 
+   - Type in two points to define a line
+   - Enter any number in the rerun box to see sections on contour plot
+   - To plot the section of a building wall, read the coordinates from your CAD file and type in to visualise a section. 
+
+6. **Reset**:
    - Press c and enter to clear cache, press r to rerun.
    - To force an update (e.g. to see sections on plot), enter any number in the Re-run button in the sidebar.
-   
+7. ** Design Codes**:
+   - This model is based on guidance from NHBC 2023 Standards, Chapter 4.2: Foundations Near Trees, for   
 """)
 
 
@@ -88,7 +94,7 @@ tree_name = st.sidebar.selectbox("Tree Species", TREE_DB['Category'].unique())
 x_coord = float(st.sidebar.text_input("X Coordinate", "50"))
 y_coord = float(st.sidebar.text_input("Y Coordinate", "50"))
 z_coord = float(st.sidebar.text_input("Tree Base Elevation", str(starting_elevation)))
-remove_status = st.sidebar.selectbox("Remove Tree?", ['No', 'Yes'])
+
 
 st.sidebar.header("Re-run figure to update sections")
 section = float(st.sidebar.text_input("Type any number and enter to update section lines", "0"))
