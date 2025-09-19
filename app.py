@@ -243,23 +243,9 @@ if st.session_state.trees:
         click_df = pd.DataFrame(st.session_state.click_points, columns=['X', 'Y'])
         st.dataframe(click_df)
     
-    # Create section line if two points are clicked
+    # Create section line only when user confirms
     if len(st.session_state.click_points) >= 2:
-        start = st.session_state.click_points.pop(0)
-        end = st.session_state.click_points.pop(0)
-        label = chr(65 + len(st.session_state.section_lines)) + "-" + chr(65 + len(st.session_state.section_lines)) + "'"
-        color_list = ['red', 'blue', 'green', 'orange', 'purple']
-        color = color_list[len(st.session_state.section_lines) % len(color_list)]
-        st.session_state.section_lines.append({
-            'label': label,
-            'start': start,
-            'end': end,
-            'color': color
-        })
-        st.experimental_rerun()
-    
-    if len(st.session_state.click_points) >= 2:
-        if st.button("Add Section Line"):
+        if st.button("Confirm Section Line"):
             start = st.session_state.click_points.pop(0)
             end = st.session_state.click_points.pop(0)
             label = chr(65 + len(st.session_state.section_lines)) + "-" + chr(65 + len(st.session_state.section_lines)) + "'"
@@ -271,7 +257,9 @@ if st.session_state.trees:
                 'end': end,
                 'color': color
             })
-            st.experimental_rerun()
+            st.experimental_rerun()  # This is now safe because it's before rendering anything else
+    
+    
 
 
 
