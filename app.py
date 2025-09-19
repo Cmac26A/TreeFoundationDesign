@@ -57,7 +57,9 @@ Welcome to the Tree influence on Foundation Design. Here's how to use the app:
    - Colors represent depth influence, with discrete contour intervals.
 
 5. **Reset**
-   - Press c and enter to clear cache, press r to rerun
+   - Press c and enter to clear cache, press r to rerun.
+   - To force an update (e.g. to see sections on plot), enter any number in the Re-run button in the sidebar.
+   
 """)
 
 
