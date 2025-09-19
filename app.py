@@ -7,17 +7,6 @@ import plotly.graph_objects as go
 
 import streamlit as st
 
-# Initialize session state
-    
-    
-    
-if 'section_lines' not in st.session_state:
-        st.session_state.section_lines = []
-if 'click_points' not in st.session_state:
-        st.session_state.click_points = []
-
-
-
 # Page config
 st.set_page_config(page_title="GGP - Foundations Near Trees", page_icon="🌳", layout="wide")
 
@@ -31,10 +20,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Sidebar logo
-st.sidebar.image("Logo.jpeg", width='stretch')
+st.sidebar.image("Logo.jpeg", use_container_width=True)
 
 # Main page banner
-st.image("Banner.jpeg", width='stretch')
+st.image("Banner.jpeg", use_container_width=True)
 
 
 
@@ -107,8 +96,6 @@ if st.sidebar.button("Add Tree"):
 
 st.subheader("Current Trees")
 st.dataframe(pd.DataFrame(st.session_state.trees))
-
-fig = go.Figure()
 
 if st.session_state.trees:
     x_vals = [tree['X'] for tree in st.session_state.trees]
@@ -218,6 +205,11 @@ if st.session_state.trees:
 
 
 
+    # Initialize session state
+    if 'section_lines' not in st.session_state:
+        st.session_state.section_lines = []
+    if 'click_points' not in st.session_state:
+        st.session_state.click_points = []
 
     
 
@@ -241,13 +233,6 @@ if st.session_state.trees:
     # Display plot
     st.subheader("Click two points to define a section line")
 st.plotly_chart(fig, width='stretch', key='main_contour')
-
-if 'section_lines' not in st.session_state:
-        st.session_state.section_lines = []
-if 'click_points' not in st.session_state:
-        st.session_state.click_points = []
-
-
     
     # Allow user to input any coordinates
 x_click = st.number_input("X coordinate of click", value=0.0)
@@ -264,57 +249,58 @@ if st.session_state.click_points:
     st.dataframe(click_df)
     
     # Create section line if two points are clicked
-
 if len(st.session_state.click_points) >= 2:
     start = st.session_state.click_points.pop(0)
     end = st.session_state.click_points.pop(0)
-    label = "A-A'"
-    color = 'red'
-    st.session_state.section_lines = [{
+    label = chr(65 + len(st.session_state.section_lines)) + "-" + chr(65 + len(st.session_state.section_lines)) + "'"
+    color_list = ['red', 'blue', 'green', 'orange', 'purple']
+    color = color_list[len(st.session_state.section_lines) % len(color_list)]
+    st.session_state.section_lines.append({
         'label': label,
         'start': start,
         'end': end,
         'color': color
-    }]
-
+    })
     
     # Generate section plots
     
-interp_func = RegularGridInterpolator(
-    (y_coords, x_coords),
-    combined_elevations,
-    bounds_error=False,
-    fill_value=np.nan
-)
 
-for line in st.session_state.section_lines:
-    x1, y1 = line['start']
-    x2, y2 = line['end']
-    num_points = 200
-    x_line = np.linspace(x1, x2, num_points)
-    y_line = np.linspace(y1, y2, num_points)
-    points = np.array([y_line, x_line]).T
-    elevations = interp_func(points)
-    distances = np.sqrt((x_line - x1)**2 + (y_line - y1)**2)
-    
-    section_fig = go.Figure()
-    section_fig.add_trace(go.Scatter(
-        x=distances,
-        y=elevations,
-        mode='lines',
-        name=line['label'],
-        line=dict(color=line['color'])
-    ))
-    section_fig.update_layout(
-        title=f"Section View: {line['label']}",
-        xaxis_title='Distance Along Line (m)',
-        yaxis_title='Elevation (m)',
-        yaxis_scaleanchor='x',
-        height=600
+if st.session_state.trees:
+    interp_func = RegularGridInterpolator(
+        (y_coords, x_coords),
+        combined_elevations,
+        bounds_error=False,
+        fill_value=np.nan
     )
 
-st.plotly_chart(section_fig, width='stretch', key='section_0')
-            
-    
+    for line in st.session_state.section_lines:
+        x1, y1 = line['start']
+        x2, y2 = line['end']
+        num_points = 200
+        x_line = np.linspace(x1, x2, num_points)
+        y_line = np.linspace(y1, y2, num_points)
+        points = np.array([y_line, x_line]).T
+        elevations = interp_func(points)
+        distances = np.sqrt((x_line - x1)**2 + (y_line - y1)**2)
 
+        section_fig = go.Figure()
+        section_fig.add_trace(go.Scatter(
+            x=distances,
+            y=elevations,
+            mode='lines',
+            name=line['label'],
+            line=dict(color=line['color'])
+        ))
+        section_fig.update_layout(
+            title=f"Section View: {line['label']}",
+            xaxis_title='Distance Along Line (m)',
+            yaxis_title='Elevation (m)',
+            yaxis_scaleanchor='x',
+            height=600
+        )
+        st.plotly_chart(section_fig, width='stretch', key='section_0')
+    
+        
+    
+st.plotly_chart(fig, width='stretch', key='main_contour')
        
