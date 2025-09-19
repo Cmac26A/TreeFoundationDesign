@@ -260,24 +260,6 @@ if st.session_state.trees:
             'end': end,
             'color': color
         })
-
-    # Generate section plot
-    x1, y1 = start
-    x2, y2 = end
-    num_points = 200
-    x_line = np.linspace(x1, x2, num_points)
-    y_line = np.linspace(y1, y2, num_points)
-    points = np.array([y_line, x_line]).T
-    interp_func = RegularGridInterpolator((y_coords, x_coords), combined_elevations, bounds_error=False, fill_value=np.nan)
-    elevations = interp_func(points)
-    distances = np.linspace(0, np.sqrt((x2 - x1)**2 + (y2 - y1)**2), num_points)
-    min_depth_line = ffl - min_depth
-    section_fig = go.Figure()
-    section_fig.add_trace(go.Scatter(x=distances, y=[ffl]*num_points, mode='lines', name='FFL', line=dict(color='red', dash='dash')))
-    section_fig.add_trace(go.Scatter(x=distances, y=[min_depth_line]*num_points, mode='lines', name='Min Depth', line=dict(color='blue', dash='dot')))
-    section_fig.add_trace(go.Scatter(x=distances, y=elevations, mode='lines', name='Combined Elevations', line=dict(color='green')))
-    section_fig.update_layout(title=f'Section View: {label}', xaxis_title='Distance Along Line (m)', yaxis_title='Elevation (m)', yaxis_scaleanchor='x', height=600)
-    st.plotly_chart(section_fig, use_container_width=True)
     
     # Generate section plots
     
