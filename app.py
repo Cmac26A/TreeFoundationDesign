@@ -173,7 +173,8 @@ if st.session_state.trees:
         combined_elevations = np.minimum(combined_elevations, current_elevations)
 
     
-
+    z_min = combined_elevations.min()
+    z_max = combined_elevations.max()
 
     # Round to nearest lower and upper multiples of 0.3
     rounded_start = np.floor((z_min - 0.3) / 0.3) * 0.3
