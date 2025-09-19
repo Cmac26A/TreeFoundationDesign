@@ -248,19 +248,19 @@ if st.session_state.click_points:
     click_df = pd.DataFrame(st.session_state.click_points, columns=['X', 'Y'])
     st.dataframe(click_df)
     
-    # Create section line if two points are clicked
 if len(st.session_state.click_points) >= 2:
     start = st.session_state.click_points.pop(0)
     end = st.session_state.click_points.pop(0)
-    label = chr(65 + len(st.session_state.section_lines)) + "-" + chr(65 + len(st.session_state.section_lines)) + "'"
-    color_list = ['red', 'blue', 'green', 'orange', 'purple']
-    color = color_list[len(st.session_state.section_lines) % len(color_list)]
-    st.session_state.section_lines.append({
+    label = "A-A'"  # Always use the same label
+    color = 'red'   # Or let user choose
+    # Replace existing section line
+    st.session_state.section_lines = [{
         'label': label,
         'start': start,
         'end': end,
         'color': color
-    })
+    }]
+
     
     # Generate section plots
     
