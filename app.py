@@ -299,3 +299,4 @@ with st.sidebar.expander("Manual Rerun"):
     
         st.plotly_chart(fig, width='stretch')
        
+
