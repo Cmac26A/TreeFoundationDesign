@@ -1,12 +1,10 @@
 
 import streamlit as st
-from scipy.interpolate import RegularGridInterpolator
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
 import streamlit as st
-from scipy.interpolate import RegularGridInterpolator
 
 # Page config
 st.set_page_config(page_title="GGP - Foundations Near Trees", page_icon="🌳", layout="wide")
@@ -21,10 +19,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Sidebar logo
-st.sidebar.image("Logo.jpeg", width='stretch')
+st.sidebar.image("Logo.jpeg", use_container_width=True)
 
 # Main page banner
-st.image("Banner.jpeg", width='stretch')
+st.image("Banner.jpeg", use_container_width=True)
 
 
 
@@ -233,7 +231,7 @@ if st.session_state.trees:
     
     # Display plot
     st.subheader("Click two points to define a section line")
-    st.plotly_chart(fig, width='stretch')
+    st.plotly_chart(fig, use_container_width=True)
     
     # Allow user to input any coordinates
     x_click = st.number_input("X coordinate of click", value=0.0)
@@ -283,7 +281,7 @@ if st.session_state.trees:
         distances = np.sqrt((x_line - x1)**2 + (y_line - y1)**2)
     
         section_fig = go.Figure()
-        section_fig.add_trace(go.Scatter(
+        section_fig.add_trace(go.Scatter(x=distances, y=[ffl]*num_points, mode='lines', name='FFL', line=dict(color='red', dash='dash')))        section_fig.add_trace(go.Scatter(x=distances, y=[ffl - min_depth]*num_points, mode='lines', name='Min Depth', line=dict(color='blue', dash='dot')))        section_fig.add_trace(go.Scatter(
             x=distances,
             y=elevations,
             mode='lines',
@@ -297,7 +295,7 @@ if st.session_state.trees:
             yaxis_scaleanchor='x',
             height=600
         )
-        st.plotly_chart(section_fig, width='stretch')
+        st.plotly_chart(section_fig, width='stretch', key='section_plot_0')
     
         
     
