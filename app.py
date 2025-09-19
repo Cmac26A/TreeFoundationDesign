@@ -234,7 +234,7 @@ if st.session_state.trees:
 
 
     if st.button("Re-run Figure"):
-    st.experimental_rerun()
+        st.experimental_rerun()
 
     
     # Allow user to input any coordinates
