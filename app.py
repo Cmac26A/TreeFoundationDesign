@@ -238,8 +238,8 @@ st.plotly_chart(fig, width='stretch', key='main_contour')
 x_click = st.number_input("X coordinate of click", value=0.0)
 y_click = st.number_input("Y coordinate of click", value=0.0)
 if st.button("Add Click Point"):
-    ]st.session_state.click_points.append((x_click, y_click))
-    ]fig.update_layout(title='Combined Tree Root Influence Elevation Map',
+    st.session_state.click_points.append((x_click, y_click))
+    fig.update_layout(title='Combined Tree Root Influence Elevation Map',
                       xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=1000)
         
 # Show table of click points
