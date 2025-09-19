@@ -204,10 +204,11 @@ if st.session_state.trees:
         st.session_state.section_lines = []
     if 'click_points' not in st.session_state:
         st.session_state.click_points = []
+
+# Sidebar expander for manual rerun
+with st.sidebar.expander("Manual Rerun"):
+    st.text_input("Trigger Rerun", "")
     
-        # Safe manual rerun button
-    if st.sidebar.button("Re-run Figure"):
-        st.experimental_rerun()
 
     
     # Add section lines to plot
@@ -227,7 +228,6 @@ if st.session_state.trees:
         ))
     
     # Display plot
-
     st.subheader("Click two points to define a section line")
     st.plotly_chart(fig, use_container_width=True)
     
