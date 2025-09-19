@@ -91,6 +91,31 @@ if st.sidebar.button("Add Tree"):
 st.subheader("Current Trees")
 st.dataframe(pd.DataFrame(st.session_state.trees))
 
+# Show table of click points
+if st.session_state.click_points:
+    st.subheader("Click Points")
+    click_df = pd.DataFrame(st.session_state.click_points, columns=['X', 'Y'])
+    st.dataframe(click_df)
+
+# Create section line only when user confirms
+if len(st.session_state.click_points) >= 2:
+    if st.button("Confirm Section Line"):
+        start = st.session_state.click_points.pop(0)
+        end = st.session_state.click_points.pop(0)
+        label = chr(65 + len(st.session_state.section_lines)) + "-" + chr(65 + len(st.session_state.section_lines)) + "'"
+        color_list = ['red', 'blue', 'green', 'orange', 'purple']
+        color = color_list[len(st.session_state.section_lines) % len(color_list)]
+        st.session_state.section_lines.append({
+            'label': label,
+            'start': start,
+            'end': end,
+            'color': color
+        })
+        st.experimental_rerun()  # This is now safe because it's before rendering anything else
+
+
+
+
 if st.session_state.trees:
     x_vals = [tree['X'] for tree in st.session_state.trees]
     y_vals = [tree['Y'] for tree in st.session_state.trees]
@@ -237,29 +262,7 @@ if st.session_state.trees:
         fig.update_layout(title='Combined Tree Root Influence Elevation Map',
                       xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=1000)
         
-    # Show table of click points
-    if st.session_state.click_points:
-        st.subheader("Click Points")
-        click_df = pd.DataFrame(st.session_state.click_points, columns=['X', 'Y'])
-        st.dataframe(click_df)
-    
-    # Create section line only when user confirms
-    if len(st.session_state.click_points) >= 2:
-        if st.button("Confirm Section Line"):
-            start = st.session_state.click_points.pop(0)
-            end = st.session_state.click_points.pop(0)
-            label = chr(65 + len(st.session_state.section_lines)) + "-" + chr(65 + len(st.session_state.section_lines)) + "'"
-            color_list = ['red', 'blue', 'green', 'orange', 'purple']
-            color = color_list[len(st.session_state.section_lines) % len(color_list)]
-            st.session_state.section_lines.append({
-                'label': label,
-                'start': start,
-                'end': end,
-                'color': color
-            })
-            st.experimental_rerun()  # This is now safe because it's before rendering anything else
-    
-    
+
 
 
 
