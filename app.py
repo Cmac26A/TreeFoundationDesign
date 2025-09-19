@@ -7,6 +7,17 @@ import plotly.graph_objects as go
 
 import streamlit as st
 
+# Initialize session state
+    
+    
+    
+if 'section_lines' not in st.session_state:
+        st.session_state.section_lines = []
+if 'click_points' not in st.session_state:
+        st.session_state.click_points = []
+
+
+
 # Page config
 st.set_page_config(page_title="GGP - Foundations Near Trees", page_icon="🌳", layout="wide")
 
@@ -207,14 +218,6 @@ if st.session_state.trees:
 
 
 
-    # Initialize session state
-    
-    
-    
-    if 'section_lines' not in st.session_state:
-        st.session_state.section_lines = []
-    if 'click_points' not in st.session_state:
-        st.session_state.click_points = []
 
     
 
