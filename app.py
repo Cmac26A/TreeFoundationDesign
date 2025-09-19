@@ -279,39 +279,41 @@ if len(st.session_state.click_points) >= 2:
 
     
     # Generate section plots
+if st.session_state.trees and st.session_state.section_lines:
+    # safe to run interpolation and plotting
     
-interp_func = RegularGridInterpolator(
-    (y_coords, x_coords),
-    combined_elevations,
-    bounds_error=False,
-    fill_value=np.nan
-)
-
-for line in st.session_state.section_lines:
-    x1, y1 = line['start']
-    x2, y2 = line['end']
-    num_points = 200
-    x_line = np.linspace(x1, x2, num_points)
-    y_line = np.linspace(y1, y2, num_points)
-    points = np.array([y_line, x_line]).T
-    elevations = interp_func(points)
-    distances = np.sqrt((x_line - x1)**2 + (y_line - y1)**2)
-    
-    section_fig = go.Figure()
-    section_fig.add_trace(go.Scatter(
-        x=distances,
-        y=elevations,
-        mode='lines',
-        name=line['label'],
-        line=dict(color=line['color'])
-    ))
-    section_fig.update_layout(
-        title=f"Section View: {line['label']}",
-        xaxis_title='Distance Along Line (m)',
-        yaxis_title='Elevation (m)',
-        yaxis_scaleanchor='x',
-        height=600
+    interp_func = RegularGridInterpolator(
+        (y_coords, x_coords),
+        combined_elevations,
+        bounds_error=False,
+        fill_value=np.nan
     )
+    
+    for line in st.session_state.section_lines:
+        x1, y1 = line['start']
+        x2, y2 = line['end']
+        num_points = 200
+        x_line = np.linspace(x1, x2, num_points)
+        y_line = np.linspace(y1, y2, num_points)
+        points = np.array([y_line, x_line]).T
+        elevations = interp_func(points)
+        distances = np.sqrt((x_line - x1)**2 + (y_line - y1)**2)
+        
+        section_fig = go.Figure()
+        section_fig.add_trace(go.Scatter(
+            x=distances,
+            y=elevations,
+            mode='lines',
+            name=line['label'],
+            line=dict(color=line['color'])
+        ))
+        section_fig.update_layout(
+            title=f"Section View: {line['label']}",
+            xaxis_title='Distance Along Line (m)',
+            yaxis_title='Elevation (m)',
+            yaxis_scaleanchor='x',
+            height=600
+        )
 
 st.plotly_chart(section_fig, width='stretch', key='section_0')
             
