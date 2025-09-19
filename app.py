@@ -292,7 +292,7 @@ if st.session_state.trees and st.session_state.section_lines:
     for line in st.session_state.section_lines:
         x1, y1 = line['start']
         x2, y2 = line['end']
-        num_points = 200
+        num_points = 1000
         x_line = np.linspace(x1, x2, num_points)
         y_line = np.linspace(y1, y2, num_points)
         points = np.array([y_line, x_line]).T
