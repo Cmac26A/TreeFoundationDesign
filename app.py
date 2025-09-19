@@ -77,7 +77,7 @@ z_coord = float(st.sidebar.text_input("Tree Base Elevation", str(starting_elevat
 remove_status = st.sidebar.selectbox("Remove Tree?", ['No', 'Yes'])
 
 st.sidebar.header("Re-run figure to update sections")
-section = float(st.sidebar.text_input("Type any number and enter to update")) 
+section = float(st.sidebar.text_input("Type any number and enter to update section lines", "0"))
 
 if 'trees' not in st.session_state:
     st.session_state.trees = []
