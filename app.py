@@ -95,6 +95,8 @@ x_coord = float(st.sidebar.text_input("X Coordinate", "50"))
 y_coord = float(st.sidebar.text_input("Y Coordinate", "50"))
 z_coord = float(st.sidebar.text_input("Tree Base Elevation", str(starting_elevation)))
 remove_status = st.sidebar.selectbox("Remove Tree?", ['No', 'Yes']) 
+current_height = float(st.sidebar.text_input("Current Height (if removed)", "0"))
+
 
 st.sidebar.header("Re-run figure to update sections")
 section = float(st.sidebar.text_input("Type any number and enter to update section lines", "0"))
@@ -109,6 +111,7 @@ if st.sidebar.button("Add Tree"):
         'Y': y_coord,
         'Z': z_coord,
         'Remove': remove_status
+        'Current Height': current_height
     })
 
 st.subheader("Current Trees")
@@ -183,7 +186,7 @@ if st.session_state.trees:
         mature_height = tree_data['Mature Height']
         is_coniferous = tree_data['Coniferous']
         water_demand = tree_data['Water Demand']
-        height_to_use = mature_height if tree['Remove'] == 'No' else mature_height
+        height_to_use = mature_height if tree['Remove'] == 'No' else tree['Current Height']
 
         params_row = PARAM_DB[
             (PARAM_DB['Soil volume potential'] == soil_plasticity) &
