@@ -308,5 +308,5 @@ st.plotly_chart(section_fig, width='stretch', key='section_0')
     
         
     
-st.plotly_chart(fig, width='stretch', key='main_contour')
+
        
