@@ -20,10 +20,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Sidebar logo
-st.sidebar.image("Logo.jpeg", use_container_width=True)
+st.sidebar.image("Logo.jpeg", width='stretch')
 
 # Main page banner
-st.image("Banner.jpeg", use_container_width=True)
+st.image("Banner.jpeg", width='stretch')
 
 
 
@@ -232,15 +232,6 @@ if st.session_state.trees:
     
     # Display plot
     st.subheader("Click two points to define a section line")
-fig = go.Figure()
-
-if 'click_points' not in st.session_state:
-    st.session_state.click_points = []
-
-if 'section_lines' not in st.session_state:
-    st.session_state.section_lines = []
-
-
 st.plotly_chart(fig, width='stretch', key='main_contour')
     
     # Allow user to input any coordinates
@@ -257,12 +248,13 @@ if st.session_state.click_points:
     click_df = pd.DataFrame(st.session_state.click_points, columns=['X', 'Y'])
     st.dataframe(click_df)
     
+    # Create section line if two points are clicked
+
 if len(st.session_state.click_points) >= 2:
     start = st.session_state.click_points.pop(0)
     end = st.session_state.click_points.pop(0)
-    label = "A-A'"  # Always use the same label
-    color = 'red'   # Or let user choose
-    # Replace existing section line
+    label = "A-A'"
+    color = 'red'
     st.session_state.section_lines = [{
         'label': label,
         'start': start,
