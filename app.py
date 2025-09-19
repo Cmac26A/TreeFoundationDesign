@@ -206,6 +206,9 @@ if st.session_state.trees:
 
 
     # Initialize session state
+    fig = go.Figure()
+    
+    
     if 'section_lines' not in st.session_state:
         st.session_state.section_lines = []
     if 'click_points' not in st.session_state:
@@ -233,6 +236,8 @@ if st.session_state.trees:
     # Display plot
     st.subheader("Click two points to define a section line")
 st.plotly_chart(fig, width='stretch', key='main_contour')
+
+
     
     # Allow user to input any coordinates
 x_click = st.number_input("X coordinate of click", value=0.0)
