@@ -91,9 +91,6 @@ if st.sidebar.button("Add Tree"):
 st.subheader("Current Trees")
 st.dataframe(pd.DataFrame(st.session_state.trees))
 
-
-
-
 if st.session_state.trees:
     x_vals = [tree['X'] for tree in st.session_state.trees]
     y_vals = [tree['Y'] for tree in st.session_state.trees]
@@ -176,28 +173,26 @@ if st.session_state.trees:
         combined_elevations = np.minimum(combined_elevations, current_elevations)
 
     
+
+
     z_min = combined_elevations.min()
     z_max = combined_elevations.max()
-
-    # Round to nearest lower and upper multiples of 0.3
-    rounded_start = np.floor((z_min - 0.3) / 0.3) * 0.3
-    rounded_end = np.ceil((z_max + 0.3) / 0.3) * 0.3
     
-    fig = go.Figure(data=go.Contour(
-        z=combined_elevations,
-        x=x_coords,
-        y=y_coords,
-        colorscale='Greens_r',
-        contours=dict(
-            start=rounded_start,
-            end=rounded_end,
-            size=0.3,
-            coloring='heatmap'
-        ),
-        line_smoothing=0.85
-    ))
-
-    
+    fig = go.Figure(data=
+        go.Contour(
+            z=combined_elevations,
+            x=x_coords,
+            y=y_coords,
+            colorscale='Greens_r',
+            contours=dict(
+                start=z_min-0.3,       # minimum elevation value
+                end=z_max+0.3,         # maximum elevation value
+                size=0.3,         # spacing between contour levels
+                coloring='heatmap' # use heatmap-style coloring
+            ),
+            line_smoothing=0.85
+        )
+    )
     fig.update_layout(title='Combined Tree Root Influence Elevation Map',
                       xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=1000)
 
@@ -229,13 +224,11 @@ if st.session_state.trees:
         ))
     
     # Display plot
+# Sidebar button to manually rerun the figure
+if st.sidebar.button("Re-run Figure"):
+    st.experimental_rerun()
     st.subheader("Click two points to define a section line")
     st.plotly_chart(fig, use_container_width=True)
-
-
-    if st.button("Re-run Figure"):
-        st.experimental_rerun()
-
     
     # Allow user to input any coordinates
     x_click = st.number_input("X coordinate of click", value=0.0)
@@ -245,7 +238,7 @@ if st.session_state.trees:
         fig.update_layout(title='Combined Tree Root Influence Elevation Map',
                       xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=1000)
         
-        # Show table of click points
+    # Show table of click points
     if st.session_state.click_points:
         st.subheader("Click Points")
         click_df = pd.DataFrame(st.session_state.click_points, columns=['X', 'Y'])
@@ -264,12 +257,6 @@ if st.session_state.trees:
             'end': end,
             'color': color
         })
-    
-
-
-
-
-
     
     # Generate section plots
     
