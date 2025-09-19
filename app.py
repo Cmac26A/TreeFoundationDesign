@@ -192,55 +192,58 @@ if st.session_state.trees:
         combined_elevations = np.minimum(combined_elevations, current_elevations)
 
     
+        # Create section line if two points are clicked
+    if st.session_state.trees and st.session_state.section_lines:
+        # safe to run interpolation and plotting
 
 
-    z_min = combined_elevations.min()
-    z_max = combined_elevations.max()
-    
-    fig = go.Figure(data=
-        go.Contour(
-            z=combined_elevations,
-            x=x_coords,
-            y=y_coords,
-            colorscale='Greens_r',
-            contours=dict(
-                start=z_min-0.3,       # minimum elevation value
-                end=z_max+0.3,         # maximum elevation value
-                size=0.3,         # spacing between contour levels
-                coloring='heatmap' # use heatmap-style coloring
-            ),
-            line_smoothing=0.85
+        z_min = combined_elevations.min()
+        z_max = combined_elevations.max()
+        
+        fig = go.Figure(data=
+            go.Contour(
+                z=combined_elevations,
+                x=x_coords,
+                y=y_coords,
+                colorscale='Greens_r',
+                contours=dict(
+                    start=z_min-0.3,       # minimum elevation value
+                    end=z_max+0.3,         # maximum elevation value
+                    size=0.3,         # spacing between contour levels
+                    coloring='heatmap' # use heatmap-style coloring
+                ),
+                line_smoothing=0.85
+            )
         )
-    )
-    fig.update_layout(title='Combined Tree Root Influence Elevation Map',
-                      xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=1000)
-
-
-
-
-
+        fig.update_layout(title='Combined Tree Root Influence Elevation Map',
+                          xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=1000)
     
-
     
-    # Add section lines to plot
-    for i, line in enumerate(st.session_state.section_lines):
-        x1, y1 = line['start']
-        x2, y2 = line['end']
-        label = line['label']
-        color = line['color']
-        fig.add_trace(go.Scatter(
-            x=[x1, x2],
-            y=[y1, y2],
-            mode='lines+text',
-            line=dict(color=color, width=3),
-            text=[label, ''],
-            textposition='top left',
-            name=label
-        ))
     
-    # Display plot
-    st.subheader("Click two points to define a section line")
-st.plotly_chart(fig, width='stretch', key='main_contour')
+    
+    
+        
+    
+        
+        # Add section lines to plot
+        for i, line in enumerate(st.session_state.section_lines):
+            x1, y1 = line['start']
+            x2, y2 = line['end']
+            label = line['label']
+            color = line['color']
+            fig.add_trace(go.Scatter(
+                x=[x1, x2],
+                y=[y1, y2],
+                mode='lines+text',
+                line=dict(color=color, width=3),
+                text=[label, ''],
+                textposition='top left',
+                name=label
+            ))
+        
+        # Display plot
+        st.subheader("Click two points to define a section line")
+    st.plotly_chart(fig, width='stretch', key='main_contour')
 
 if 'section_lines' not in st.session_state:
         st.session_state.section_lines = []
@@ -264,54 +267,56 @@ if st.session_state.click_points:
     st.dataframe(click_df)
     
     # Create section line if two points are clicked
+if st.session_state.trees and st.session_state.section_lines:
+    # safe to run interpolation and plotting
 
-if len(st.session_state.click_points) >= 2:
-    start = st.session_state.click_points.pop(0)
-    end = st.session_state.click_points.pop(0)
-    label = "A-A'"
-    color = 'red'
-    st.session_state.section_lines = [{
-        'label': label,
-        'start': start,
-        'end': end,
-        'color': color
-    }]
-
+    if len(st.session_state.click_points) >= 2:
+        start = st.session_state.click_points.pop(0)
+        end = st.session_state.click_points.pop(0)
+        label = "A-A'"
+        color = 'red'
+        st.session_state.section_lines = [{
+            'label': label,
+            'start': start,
+            'end': end,
+            'color': color
+        }]
     
-    # Generate section plots
-    
-interp_func = RegularGridInterpolator(
-    (y_coords, x_coords),
-    combined_elevations,
-    bounds_error=False,
-    fill_value=np.nan
-)
-
-for line in st.session_state.section_lines:
-    x1, y1 = line['start']
-    x2, y2 = line['end']
-    num_points = 200
-    x_line = np.linspace(x1, x2, num_points)
-    y_line = np.linspace(y1, y2, num_points)
-    points = np.array([y_line, x_line]).T
-    elevations = interp_func(points)
-    distances = np.sqrt((x_line - x1)**2 + (y_line - y1)**2)
-    
-    section_fig = go.Figure()
-    section_fig.add_trace(go.Scatter(
-        x=distances,
-        y=elevations,
-        mode='lines',
-        name=line['label'],
-        line=dict(color=line['color'])
-    ))
-    section_fig.update_layout(
-        title=f"Section View: {line['label']}",
-        xaxis_title='Distance Along Line (m)',
-        yaxis_title='Elevation (m)',
-        yaxis_scaleanchor='x',
-        height=600
+        
+        # Generate section plots
+        
+    interp_func = RegularGridInterpolator(
+        (y_coords, x_coords),
+        combined_elevations,
+        bounds_error=False,
+        fill_value=np.nan
     )
-
-st.plotly_chart(section_fig, width='stretch', key='section_0')
-            
+    
+    for line in st.session_state.section_lines:
+        x1, y1 = line['start']
+        x2, y2 = line['end']
+        num_points = 200
+        x_line = np.linspace(x1, x2, num_points)
+        y_line = np.linspace(y1, y2, num_points)
+        points = np.array([y_line, x_line]).T
+        elevations = interp_func(points)
+        distances = np.sqrt((x_line - x1)**2 + (y_line - y1)**2)
+        
+        section_fig = go.Figure()
+        section_fig.add_trace(go.Scatter(
+            x=distances,
+            y=elevations,
+            mode='lines',
+            name=line['label'],
+            line=dict(color=line['color'])
+        ))
+        section_fig.update_layout(
+            title=f"Section View: {line['label']}",
+            xaxis_title='Distance Along Line (m)',
+            yaxis_title='Elevation (m)',
+            yaxis_scaleanchor='x',
+            height=600
+        )
+    
+    st.plotly_chart(section_fig, width='stretch', key='section_0')
+                
