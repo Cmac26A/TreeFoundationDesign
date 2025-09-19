@@ -207,7 +207,7 @@ if st.session_state.trees:
 
 # Sidebar expander for manual rerun
 with st.sidebar.expander("Manual Rerun"):
-    st.text_input("Trigger Rerun", "")
+    dummy_rerun = st.text_input("Trigger Rerun", "")
     
 
     
