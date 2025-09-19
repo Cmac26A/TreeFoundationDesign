@@ -256,7 +256,7 @@ if st.session_state.trees:
             'end': end,
             'color': color
         })
-    
+        st.experimental_rerun()
     # Generate section plots
     
     interp_func = RegularGridInterpolator(
