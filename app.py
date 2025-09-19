@@ -257,6 +257,27 @@ if st.session_state.trees:
             'color': color
         })
         st.experimental_rerun()
+    
+    if len(st.session_state.click_points) >= 2:
+        if st.button("Add Section Line"):
+            start = st.session_state.click_points.pop(0)
+            end = st.session_state.click_points.pop(0)
+            label = chr(65 + len(st.session_state.section_lines)) + "-" + chr(65 + len(st.session_state.section_lines)) + "'"
+            color_list = ['red', 'blue', 'green', 'orange', 'purple']
+            color = color_list[len(st.session_state.section_lines) % len(color_list)]
+            st.session_state.section_lines.append({
+                'label': label,
+                'start': start,
+                'end': end,
+                'color': color
+            })
+            st.experimental_rerun()
+
+
+
+
+
+    
     # Generate section plots
     
     interp_func = RegularGridInterpolator(
