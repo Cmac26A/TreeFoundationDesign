@@ -1,5 +1,6 @@
 
 import streamlit as st
+import scipy
 from scipy.interpolate import RegularGridInterpolator
 import numpy as np
 import pandas as pd
