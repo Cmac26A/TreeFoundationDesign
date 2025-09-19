@@ -312,8 +312,7 @@ for line in st.session_state.section_lines:
         yaxis_scaleanchor='x',
         height=600
     )
-st.plotly_chart(section_fig, width='stretch', key='section_0')
-    
+
         
     
 
