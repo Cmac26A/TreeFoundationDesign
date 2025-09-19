@@ -205,9 +205,9 @@ if st.session_state.trees:
     if 'click_points' not in st.session_state:
         st.session_state.click_points = []
 
-# Sidebar expander for manual rerun
-with st.sidebar.expander("Manual Rerun"):
-    dummy_rerun = st.text_input("Trigger Rerun", "")
+# Simple rerun button in sidebar
+if st.sidebar.button("Re-run Figure"):
+    st.experimental_rerun()
     
 
     
