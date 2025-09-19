@@ -175,24 +175,25 @@ if st.session_state.trees:
     
 
 
-    z_min = combined_elevations.min()
-    z_max = combined_elevations.max()
+    # Round to nearest lower and upper multiples of 0.3
+    rounded_start = np.floor((z_min - 0.3) / 0.3) * 0.3
+    rounded_end = np.ceil((z_max + 0.3) / 0.3) * 0.3
     
-    fig = go.Figure(data=
-        go.Contour(
-            z=combined_elevations,
-            x=x_coords,
-            y=y_coords,
-            colorscale='Greens_r',
-            contours=dict(
-                start=z_min-0.3,       # minimum elevation value
-                end=z_max+0.3,         # maximum elevation value
-                size=0.3,         # spacing between contour levels
-                coloring='heatmap' # use heatmap-style coloring
-            ),
-            line_smoothing=0.85
-        )
-    )
+    fig = go.Figure(data=go.Contour(
+        z=combined_elevations,
+        x=x_coords,
+        y=y_coords,
+        colorscale='Greens_r',
+        contours=dict(
+            start=rounded_start,
+            end=rounded_end,
+            size=0.3,
+            coloring='heatmap'
+        ),
+        line_smoothing=0.85
+    ))
+
+    
     fig.update_layout(title='Combined Tree Root Influence Elevation Map',
                       xaxis_scaleanchor='y', xaxis=dict(title='X'), yaxis=dict(title='Y'),height=1000)
 
