@@ -94,7 +94,7 @@ tree_name = st.sidebar.selectbox("Tree Species", TREE_DB['Category'].unique())
 x_coord = float(st.sidebar.text_input("X Coordinate", "50"))
 y_coord = float(st.sidebar.text_input("Y Coordinate", "50"))
 z_coord = float(st.sidebar.text_input("Tree Base Elevation", str(starting_elevation)))
-
+remove_status = st.sidebar.selectbox("Remove Tree?", ['No', 'Yes']) 
 
 st.sidebar.header("Re-run figure to update sections")
 section = float(st.sidebar.text_input("Type any number and enter to update section lines", "0"))
