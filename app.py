@@ -97,6 +97,8 @@ if st.sidebar.button("Add Tree"):
 st.subheader("Current Trees")
 st.dataframe(pd.DataFrame(st.session_state.trees))
 
+fig = go.Figure()
+
 if st.session_state.trees:
     x_vals = [tree['X'] for tree in st.session_state.trees]
     y_vals = [tree['Y'] for tree in st.session_state.trees]
@@ -206,7 +208,7 @@ if st.session_state.trees:
 
 
     # Initialize session state
-    fig = go.Figure()
+    
     
     
     if 'section_lines' not in st.session_state:
